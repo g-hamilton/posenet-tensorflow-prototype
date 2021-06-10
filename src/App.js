@@ -13,10 +13,15 @@ function App() {
   // run posenet model
   // https://github.com/tensorflow/tfjs-models/tree/master/posenet
   const runPosenet = async () => {
+    // load posenet
     const net = await posenet.load({
       inputResolution: { width: 640, height: 480 },
       scale: 0.5,
     });
+    // run pose detection every 100ms
+    setInterval(() => {
+      detect(net);
+    }, 100);
   };
 
   // detect poses
@@ -41,6 +46,9 @@ function App() {
       console.log(pose);
     }
   };
+
+  // let's do this!
+  runPosenet();
 
   return (
     <div className="App">
