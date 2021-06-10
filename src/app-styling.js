@@ -3,10 +3,7 @@ import Webcam from "react-webcam";
 
 export const Camera = styled(Webcam)`
   position: absolute;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
+  right: 20px;
   text-align: center;
   z-index: 9;
   width: 640px;
@@ -15,12 +12,35 @@ export const Camera = styled(Webcam)`
 
 export const Canvas = styled.canvas`
   position: absolute;
-  left: 0;
-  right: 0;
-  margin-left: auto;
-  margin-right: auto;
+  right: 20px;
   text-align: center;
   z-index: 9;
   width: 640px;
   height: 480px;
+`;
+
+export const Photo = styled.img`
+  position: absolute;
+  left: 20px;
+  text-align: center;
+  z-index: 9;
+  width: 640px;
+  height: 480px;
+`;
+
+export const ImageCanvas = styled.canvas`
+  position: absolute;
+  left: 20px;
+  text-align: center;
+  z-index: 9;
+  width: 640px;
+  height: 480px;
+`;
+
+export const Controls = styled.div`
+  margin-bottom: 20px;
+`;
+
+export const ControlButton = styled.button`
+  margin-right: 10px;
 `;
