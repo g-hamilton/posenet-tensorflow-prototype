@@ -1590,6 +1590,11 @@
     "@svgr/plugin-svgo" "^5.5.0"
     loader-utils "^2.0.0"
 
+"@tensorflow-models/posenet@^2.2.2":
+  version "2.2.2"
+  resolved "https://registry.yarnpkg.com/@tensorflow-models/posenet/-/posenet-2.2.2.tgz#2abcfa33b43892135d232c9c4408a38cc8f74ba6"
+  integrity sha512-0SXIksRet/IdX7WVH+JSD6W3upkGHix1hwtd3xykIoIMGR7zQ4SC5+wZcNt9ofASyxNYQoI+tUULUo4LNw0c3w==
+
 "@tensorflow/tfjs-backend-cpu@3.7.0":
   version "3.7.0"
   resolved "https://registry.yarnpkg.com/@tensorflow/tfjs-backend-cpu/-/tfjs-backend-cpu-3.7.0.tgz#146ad00a8fffdf4794f9b1a0bfc080cddba96836"
