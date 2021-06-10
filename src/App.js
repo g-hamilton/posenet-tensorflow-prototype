@@ -5,6 +5,7 @@ import * as posenet from "@tensorflow-models/posenet";
 
 import "./App.css";
 import { Camera, Canvas } from "./app-styling";
+import { drawKeypoints, drawSkeleton } from "./utils";
 
 function App() {
   const webcamRef = useRef(null);
@@ -43,8 +44,21 @@ function App() {
 
       // make pose detections
       const pose = await net.estimateSinglePose(video);
-      console.log(pose);
+      // console.log(pose);
+
+      // draw the estimated pose to the canvas
+      drawCanvas(pose, video, videoWidth, videoHeight, canvasRef);
     }
+  };
+
+  // draw to canvas
+  const drawCanvas = (pose, video, videoWidth, videoHeight, canvas) => {
+    const ctx = canvas.current.getContext("2d");
+    canvas.current.width = videoWidth;
+    canvas.current.height = videoHeight;
+
+    drawKeypoints(pose["keypoints"], 0.5, ctx);
+    drawSkeleton(pose["keypoints"], 0.5, ctx);
   };
 
   // let's do this!
