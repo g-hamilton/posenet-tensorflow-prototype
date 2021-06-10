@@ -19,6 +19,29 @@ function App() {
     });
   };
 
+  // detect poses
+  const detect = async (net) => {
+    // check webcam is ready
+    if (
+      typeof webcamRef.current !== undefined &&
+      webcamRef.current !== null &&
+      webcamRef.current.video.readyState === 4
+    ) {
+      // get video properties
+      const video = webcamRef.current.video;
+      const videoWidth = webcamRef.current.video.videoWidth;
+      const videoHeight = webcamRef.current.video.videoHeight;
+
+      // set video width
+      webcamRef.current.video.width = videoWidth;
+      webcamRef.current.video.height = videoHeight;
+
+      // make pose detections
+      const pose = await net.estimateSinglePose(video);
+      console.log(pose);
+    }
+  };
+
   return (
     <div className="App">
       <header className="App-header">
