@@ -1,5 +1,6 @@
 import { useRef } from "react";
 
+// eslint-disable-next-line no-unused-vars
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 
@@ -10,19 +11,16 @@ import { drawKeypoints, drawSkeleton } from "./utils";
 function App() {
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+  const posenetRef = useRef(null);
+  const intervalRef = useRef(null);
 
-  // run posenet model
+  // load posenet model
   // https://github.com/tensorflow/tfjs-models/tree/master/posenet
-  const runPosenet = async () => {
-    // load posenet
-    const net = await posenet.load({
+  const loadPosenet = async () => {
+    posenetRef.current = await posenet.load({
       inputResolution: { width: 640, height: 480 },
       scale: 0.5,
     });
-    // run pose detection every 100ms
-    setInterval(() => {
-      detect(net);
-    }, 100);
   };
 
   // detect poses
@@ -61,14 +59,42 @@ function App() {
     drawSkeleton(pose["keypoints"], 0.5, ctx);
   };
 
-  // let's do this!
-  runPosenet();
+  // start detecting pose
+  const runDetection = () => {
+    console.log("starting detection");
+    intervalRef.current = setInterval(() => {
+      detect(posenetRef.current);
+    }, 100);
+  };
+
+  // stop detecting pose
+  const stopDetection = () => {
+    console.log("stopping detection");
+    // stop active pose detection
+    clearInterval(intervalRef.current);
+    // clear the canvas
+    setTimeout(() => {
+      const ctx = canvasRef.current.getContext("2d");
+      ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    }, 120);
+    intervalRef.current = null;
+  };
+
+  // load posenet on app load
+  loadPosenet();
 
   return (
     <div className="App">
       <header className="App-header">
-        <Camera ref={webcamRef} />
-        <Canvas ref={canvasRef} />
+        <div style={{ marginBottom: 20 }}>
+          <h1>Let's Flow!</h1>
+          <button onClick={runDetection}>Start Detection</button>
+          <button onClick={stopDetection}>Stop Detection</button>
+        </div>
+        <div>
+          <Camera ref={webcamRef} />
+          <Canvas ref={canvasRef} />
+        </div>
       </header>
     </div>
   );
