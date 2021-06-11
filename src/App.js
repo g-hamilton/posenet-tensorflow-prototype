@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 
+import firebase from "firebase/app";
+
 import { ProgressBar } from "react-bootstrap";
 
 // eslint-disable-next-line no-unused-vars
@@ -18,6 +20,23 @@ import {
   ControlButton,
 } from "./app-styling";
 import { drawKeypoints, drawSkeleton } from "./utils";
+
+// firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyBdynOacveGLkZMQC6FBOc8UVmtbboHcIs",
+  authDomain: "posenet-tensorflow-react.firebaseapp.com",
+  projectId: "posenet-tensorflow-react",
+  storageBucket: "posenet-tensorflow-react.appspot.com",
+  messagingSenderId: "657689167091",
+  appId: "1:657689167091:web:2f2acaf3a1670000d52386",
+};
+
+// initialise firebase
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig);
+} else {
+  firebase.app(); // if already initialised, use that one
+}
 
 function App() {
   const webcamRef = useRef(null);
