@@ -23,7 +23,9 @@ function App() {
   const posenetRef = useRef(null);
   const intervalRef = useRef(null);
   const imageCanvasRef = useRef(null);
+
   const [poseFromPhoto, setPoseFromPhoto] = useState(null);
+  const [userPose, setUserPose] = useState(null);
 
   // load posenet model
   // https://github.com/tensorflow/tfjs-models/tree/master/posenet
@@ -55,6 +57,9 @@ function App() {
       const pose = await net.estimateSinglePose(video);
       // console.log(pose);
 
+      // update state
+      setUserPose(pose);
+
       // draw the estimated pose to the canvas
       drawCanvas(pose, videoWidth, videoHeight, canvasRef.current);
     }
@@ -75,7 +80,7 @@ function App() {
     console.log("starting detection");
     intervalRef.current = setInterval(() => {
       detect(posenetRef.current);
-    }, 100);
+    }, 150);
   };
 
   // stop detecting pose
@@ -87,11 +92,13 @@ function App() {
     setTimeout(() => {
       const ctx = canvasRef.current.getContext("2d");
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
-    }, 120);
+    }, 160);
     intervalRef.current = null;
   };
 
-  const optimizeImageFile = (file) => {
+  // on image upload
+  const onImageUpload = (file) => {
+    // optimise & display the image
     const URL = window.URL || window.webkitURL;
     const MAX_SIZE_IMG_W = 640;
     const MAX_SIZE_IMG_H = 480;
@@ -149,9 +156,7 @@ function App() {
       <header className="App-header">
         <div>
           <h1>Let's Flow! 🧘🏻‍♀️</h1>
-          <Dropzone
-            onDrop={(acceptedFiles) => optimizeImageFile(acceptedFiles[0])}
-          >
+          <Dropzone onDrop={(acceptedFiles) => onImageUpload(acceptedFiles[0])}>
             {({ getRootProps, getInputProps }) => (
               <section>
                 <div {...getRootProps()}>
