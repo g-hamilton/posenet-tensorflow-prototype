@@ -6,6 +6,7 @@ import { ProgressBar } from "react-bootstrap";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 
+// https://react-dropzone.js.org/
 import Dropzone from "react-dropzone";
 
 import "./App.css";
