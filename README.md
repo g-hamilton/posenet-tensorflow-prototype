@@ -6,6 +6,26 @@ The project is a prototype React web application utilising Tensorflow.js and the
 
 The project is available publicly at the following url: [https://posenet-tensorflow-react.web.app/](https://posenet-tensorflow-react.web.app/).
 
+## Instructions
+
+Once the project is running in the browser:
+
+1. Drag and drop or click the dropzone to select any image that contains a human (yoga) pose. Many images are avalable at [Unsplash](https://unsplash.com/s/photos/yoga-pose).
+
+2. On upload, the image will be analysed by PoseNet. The pose will be estimated and drawn over the uploaded image on screen.
+
+3. Click 'Start Detection' to begin analysing your own pose through your webcam. Your pose will be fed to PoseNet, analysed and drawn onto the screen.
+
+4. Try to copy the pose in the uploaded image as closely as possible. The more accurate you get, the more the progress bar will move to the right. Have fun!
+
+## Future Updates
+
+1. Bounding box to improve accuracy (coming next).
+
+2. Need to keep a close eye on memory consumption.
+
+3. Lots more!
+
 ## Available Scripts
 
 In the project directory, you can run:
