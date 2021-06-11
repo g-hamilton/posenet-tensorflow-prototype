@@ -43,4 +43,5 @@ export const Controls = styled.div`
 
 export const ControlButton = styled.button`
   margin-right: 10px;
+  margin-bottom: 20px;
 `;

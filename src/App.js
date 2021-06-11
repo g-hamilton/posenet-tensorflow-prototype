@@ -1,5 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 
+import { ProgressBar } from "react-bootstrap";
+
 // eslint-disable-next-line no-unused-vars
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
@@ -97,6 +99,8 @@ function App() {
       ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
     }, 160);
     intervalRef.current = null;
+    overallMatchScore.current = null;
+    setUserPose(null);
   };
 
   // method to transform a pose object from posenet into a
@@ -272,13 +276,26 @@ function App() {
           </Dropzone>
         </div>
         <Controls>
-          <ControlButton onClick={runDetection}>Start Detection</ControlButton>
-          <ControlButton onClick={stopDetection}>Stop Detection</ControlButton>
+          <ControlButton
+            className="btn btn-sm btn-primary"
+            onClick={runDetection}
+          >
+            Start Detection
+          </ControlButton>
+          <ControlButton
+            className="btn btn-sm btn-primary"
+            onClick={stopDetection}
+          >
+            Stop Detection
+          </ControlButton>
           {overallMatchScore.current && (
-            <div>
-              <p>{overallMatchScore.current}</p>
-              <p>{meaningfulFeedback.current}</p>
-            </div>
+            <ProgressBar
+              now={((5000 - overallMatchScore.current) / 5000) * 100}
+              animated
+              striped
+              variant="success"
+              label={`${meaningfulFeedback.current}`}
+            />
           )}
         </Controls>
         <div>
