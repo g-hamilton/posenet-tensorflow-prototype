@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 // eslint-disable-next-line no-unused-vars
 import * as tf from "@tensorflow/tfjs";
@@ -23,8 +23,11 @@ function App() {
   const posenetRef = useRef(null);
   const intervalRef = useRef(null);
   const imageCanvasRef = useRef(null);
+  const poseFromPhoto = useRef(null);
+  const photoVector = useRef(null);
+  const overallMatchScore = useRef(null);
+  const meaningfulFeedback = useRef(null);
 
-  const [poseFromPhoto, setPoseFromPhoto] = useState(null);
   const [userPose, setUserPose] = useState(null);
 
   // load posenet model
@@ -96,6 +99,38 @@ function App() {
     intervalRef.current = null;
   };
 
+  // method to transform a pose object from posenet into a
+  // vector (52-float) array of flattened data.
+  // returns a vector array where...
+  // Values 0-33: are x,y coordinates for 17 body parts in alphabetical order
+  // Values 34-51: are confidence values for each of the 17 body parts in alphabetical order
+  // Value 51: A sum of all the confidence values
+  const composeVector = (pose) => {
+    // copy the pose object to avoid mutating the original when sorting
+    const p = JSON.parse(JSON.stringify(pose));
+    // sort keypoints alphabetically
+    p.keypoints.sort((a, b) => {
+      const textA = a.part.toLowerCase();
+      const textB = b.part.toLowerCase();
+      return textA < textB ? -1 : textA > textB ? 1 : 0;
+    });
+    // init an empty array
+    const flatArray = [];
+    // iterate the sorted keypoints to extract x & y positions (filling values 0-33 of the vector array)
+    p.keypoints.forEach((kp) => {
+      flatArray.push(kp.position.x);
+      flatArray.push(kp.position.y);
+    });
+    // iterate the sorted keypoints to extract each keypoint confidence score (filling values 34-51 of the vector array)
+    p.keypoints.forEach((kp) => {
+      flatArray.push(kp.score);
+    });
+    // extract the overall confidence score (filling value 52 of the vector array)
+    flatArray.push(p.score);
+    // return the vector
+    return flatArray;
+  };
+
   // on image upload
   const onImageUpload = (file) => {
     // optimise & display the image
@@ -129,12 +164,20 @@ function App() {
         const base64Data = resultCanvas.toDataURL("image/jpeg");
         document.getElementById("thumb").src = base64Data;
 
-        // make pose detections
+        // make pose detection
         const pose = await posenetRef.current.estimateSinglePose(resultCanvas);
-
-        // update state
-        setPoseFromPhoto(pose);
         console.log("estimated pose from uploaded image:", pose);
+
+        // transform the keypoints object to a flat array
+        if (pose) {
+          // update refs
+          poseFromPhoto.current = pose;
+          photoVector.current = composeVector(poseFromPhoto.current);
+          console.log(
+            "flattened keypoints array from uploaded image:",
+            photoVector.current
+          );
+        }
 
         // draw the estimated pose to the canvas
         drawCanvas(
@@ -147,6 +190,64 @@ function App() {
     };
     imageObj.src = URL.createObjectURL(file);
   };
+
+  const weightedDistanceMatching = (poseVector1, poseVector2) => {
+    let vector1PoseXY = poseVector1.slice(0, 34);
+    let vector1Confidences = poseVector1.slice(34, 51);
+    let vector1ConfidenceSum = poseVector1.slice(51, 52);
+
+    let vector2PoseXY = poseVector2.slice(0, 34);
+
+    // First summation
+    let summation1 = 1 / vector1ConfidenceSum;
+
+    // Second summation
+    let summation2 = 0;
+    for (let i = 0; i < vector1PoseXY.length; i++) {
+      let tempConf = Math.floor(i / 2);
+      let tempSum =
+        vector1Confidences[tempConf] *
+        Math.abs(vector1PoseXY[i] - vector2PoseXY[i]);
+      summation2 = summation2 + tempSum;
+    }
+
+    return summation1 * summation2;
+  };
+
+  const getMeaningfulFeedback = (score) => {
+    switch (true) {
+      case score < 100:
+        return "Immaculate!";
+      case score < 250:
+        return "Incredible!";
+      case score < 500:
+        return "Really good!";
+      case score < 1000:
+        return "Almost there!";
+      case score < 2000:
+        return "Needs a little work";
+      case score < 3000:
+        return "Try to match the pose in the photo";
+      default:
+        return "Try to match the pose in the photo";
+    }
+  };
+
+  // on first mount & when user pose data changes
+  // we can try to compare the user pose with the uploaded photo pose
+  // using the techniques used by Google's Move Mirror team:
+  // https://medium.com/tensorflow/move-mirror-an-ai-experiment-with-pose-estimation-in-the-browser-using-tensorflow-js-2f7b769f9b23
+  useEffect(() => {
+    if (photoVector.current && userPose) {
+      // flatten the keypoints object into a vector array
+      const userVector = composeVector(userPose);
+      // time to compare the two poses
+      const result = weightedDistanceMatching(photoVector.current, userVector);
+      overallMatchScore.current = result;
+      // generate some kind of meaningful feedback for the user
+      meaningfulFeedback.current = getMeaningfulFeedback(result);
+    }
+  }, [userPose]);
 
   // load posenet on app load
   loadPosenet();
@@ -173,6 +274,12 @@ function App() {
         <Controls>
           <ControlButton onClick={runDetection}>Start Detection</ControlButton>
           <ControlButton onClick={stopDetection}>Stop Detection</ControlButton>
+          {overallMatchScore.current && (
+            <div>
+              <p>{overallMatchScore.current}</p>
+              <p>{meaningfulFeedback.current}</p>
+            </div>
+          )}
         </Controls>
         <div>
           <Photo id="thumb" src="" alt="upload a yoga pose photo to begin" />
