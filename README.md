@@ -2,6 +2,10 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+The project is a prototype React web application utilising Tensorflow.js and the PoseNet model to estimate & compare human (yoga) poses.
+
+The project is available publicly at the following url: [https://posenet-tensorflow-react.web.app/](https://posenet-tensorflow-react.web.app/).
+
 ## Available Scripts
 
 In the project directory, you can run:
