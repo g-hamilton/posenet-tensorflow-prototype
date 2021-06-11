@@ -6,8 +6,7 @@ import { ProgressBar } from "react-bootstrap";
 import * as tf from "@tensorflow/tfjs";
 import * as posenet from "@tensorflow-models/posenet";
 
-// https://react-dropzone.js.org/
-import Dropzone from "react-dropzone";
+import { StyledDropzone } from "./components/dropzone/dropzone";
 
 import "./App.css";
 import {
@@ -83,7 +82,7 @@ function App() {
 
   // start detecting pose
   const runDetection = () => {
-    console.log("starting detection");
+    // console.log("starting detection");
     intervalRef.current = setInterval(() => {
       detect(posenetRef.current);
     }, 150);
@@ -91,7 +90,7 @@ function App() {
 
   // stop detecting pose
   const stopDetection = () => {
-    console.log("stopping detection");
+    // console.log("stopping detection");
     // stop active pose detection
     clearInterval(intervalRef.current);
     // clear the canvas
@@ -171,17 +170,17 @@ function App() {
 
         // make pose detection
         const pose = await posenetRef.current.estimateSinglePose(resultCanvas);
-        console.log("estimated pose from uploaded image:", pose);
+        // console.log("estimated pose from uploaded image:", pose);
 
         // transform the keypoints object to a flat array
         if (pose) {
           // update refs
           poseFromPhoto.current = pose;
           photoVector.current = composeVector(poseFromPhoto.current);
-          console.log(
-            "flattened keypoints array from uploaded image:",
-            photoVector.current
-          );
+          // console.log(
+          //   "flattened keypoints array from uploaded image:",
+          //   photoVector.current
+          // );
         }
 
         // draw the estimated pose to the canvas
@@ -262,19 +261,9 @@ function App() {
       <header className="App-header">
         <div>
           <h1>Let's Flow! 🧘🏻‍♀️</h1>
-          <Dropzone onDrop={(acceptedFiles) => onImageUpload(acceptedFiles[0])}>
-            {({ getRootProps, getInputProps }) => (
-              <section>
-                <div {...getRootProps()}>
-                  <input {...getInputProps()} />
-                  <p>
-                    Drag 'n' drop a yogo pose photo here, or click to select an
-                    image file
-                  </p>
-                </div>
-              </section>
-            )}
-          </Dropzone>
+          <StyledDropzone
+            onDrop={(acceptedFiles) => onImageUpload(acceptedFiles[0])}
+          />
         </div>
         <Controls>
           <ControlButton
@@ -300,7 +289,7 @@ function App() {
           )}
         </Controls>
         <div>
-          <Photo id="thumb" src="" alt="upload a yoga pose photo to begin" />
+          <Photo id="thumb" src="" alt="upload a yoga pose photo to begin ⬆️" />
           <ImageCanvas ref={imageCanvasRef} />
         </div>
         <div>
